@@ -1,4 +1,4 @@
-# Read a osu file
+# Read a .osu file
 from pprint import pprint
 from point import Point
 from slider import *
@@ -16,6 +16,7 @@ def isValidCoord(upper, value):
 def addData(line):
     obj_type = int(line.split(',')[3])
 
+    # Abort if spinner
     if obj_type & 8 > 0:
         return
     elif obj_type & 2 > 0:
@@ -29,7 +30,7 @@ def addCircle(line):
     # x, y coordinate
     x, y = int(line[0]), int(line[1])
 
-    # compute a block the circle is contained
+    # compute a block the circle is contained in
     block_x = int(x / 32.06)
     block_y = int(y / 32.08)
 
@@ -66,7 +67,6 @@ def addSlider(line):
 if __name__ == "__main__":
     # Read a osu file
     file_location = input()
-    objstr = None
 
     with open(file_location, 'r', encoding='UTF8') as file:
         while True:
@@ -86,5 +86,8 @@ if __name__ == "__main__":
     df = pd.DataFrame(dat)
     print(df)
 
+    # annot: a number on box | cmap: color | ticklabels: a number on axes
     ax = sns.heatmap(df, annot=True, fmt='d', cmap='RdYlGn_r', xticklabels=False, yticklabels=False)
-    plt.show() 
+    # Put a title of heatmap
+    plt.title(file_location, loc='right', fontsize=12)
+    plt.show()

@@ -78,7 +78,7 @@ class BezierSlider(Slider):
 # but coding it is hassle for me lol
 # and not only that, the number of edges to approximate the curve can be reduced.
 # I don't need accurate coordinates, so I just compromised :)
-# What is cutdown polygon? You can check that on doi:10.1016/j.cagd.2008.08.002
+# If you wonder what is a cutdown polygon, you can find it on the following paper: doi:10.1016/j.cagd.2008.08.002
 
             output.append(buf[0][0])
             for aprx_curve in buf:
@@ -133,6 +133,8 @@ class BezierSlider(Slider):
 
         return output
 
+# As it use cutdown polygon to approximate, this flatness test is needed to be modified.
+# But I have no idea for this... and its approximations are accurate enough for now!
     @staticmethod
     def isFlatEnough(control_points):
         if len(control_points) <= 2:
