@@ -2,5 +2,11 @@
 
 Visualize a map with a heatmap!
 
+![example_ice_angel](./image/ice_angel.png)
+
 ## How to use it
-Soon™
+1. install packages in requirements.txt
+1. Run plot.py, and input the path of .osu file (either absolute or relative)
+
+## What it lacks (will be updated)
+* Support perfect circle sliders and catmull sliders

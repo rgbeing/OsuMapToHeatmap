@@ -1,3 +1,8 @@
+''' References:
+            https://github.com/OliBomby/Bezier-Approximation/blob/master/path_approximator.py
+            https://github.com/McKay42/McOsu/blob/master/src/App/Osu/OsuSliderCurves.cpp
+'''
+
 import copy
 import abc
 import math
