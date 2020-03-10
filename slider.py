@@ -152,8 +152,23 @@ class BezierSlider(Slider):
 
 class LinearSlider(Slider):
     def getEndPoint(self):
-        ratio = self.length / math.sqrt((self.points[0][1] - self.points[0][0]).normSquared())
-        end = self.points[0][0] + (self.points[0][1] - self.points[0][0]) * ratio
+        # There are cases the number of control points of linear slider is more than two.
+        # e.g.) Tsurupettan https://osu.ppy.sh/beatmapsets/2626#osu/19990
+        # Codes are needed to deal with these situation.
+        len_left = self.length
+        line_num = len(self.points[0]) - 1
+
+        for i in range(line_num - 1):
+            len_segment = math.sqrt((self.points[0][i + 1] - self.points[0][i]).normSquared())
+            if len_segment > len_left:
+                ratio = len_left / len_segment
+                end = self.points[0][i] + (self.points[0][i + 1] -  self.points[0][i]) * ratio
+                return end
+            
+            len_left -= len_segment
+
+        ratio = len_left / math.sqrt((self.points[0][-1] - self.points[0][-2]).normSquared())
+        end = self.points[0][0] + (self.points[0][-1] - self.points[0][-2]) * ratio
         end.x = round(end.x)
         end.y = round(end.y)
         return end
