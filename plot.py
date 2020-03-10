@@ -8,7 +8,12 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-dat = [[0 for j in range(16)] for i in range(12)]
+CELL_COL_NUM = 15
+CELL_ROW_NUM = 11
+CELL_WIDTH = 513 / CELL_COL_NUM
+CELL_HEIGHT = 385 / CELL_ROW_NUM
+
+dat = [[0 for j in range(CELL_COL_NUM)] for i in range(CELL_ROW_NUM)]
 
 def isValidCoord(upper, value):
     return value < upper and value >= 0
@@ -31,11 +36,11 @@ def addCircle(line):
     x, y = int(line[0]), int(line[1])
 
     # compute a block the circle is contained in
-    block_x = int(x / 32.06)
-    block_y = int(y / 32.08)
+    block_x = int(x / CELL_WIDTH)
+    block_y = int(y / CELL_HEIGHT)
 
     # add the object into the block
-    if isValidCoord(16, block_x) and isValidCoord(12, block_y):
+    if isValidCoord(CELL_COL_NUM, block_x) and isValidCoord(CELL_ROW_NUM, block_y):
         dat[block_y][block_x] += 1
 
 def addSlider(line):
@@ -57,10 +62,10 @@ def addSlider(line):
     for pt in [head, tail]:
         x, y = pt.x, pt.y
 
-        block_x = int(x / 32.06)
-        block_y = int(y / 32.08)
+        block_x = int(x / CELL_WIDTH)
+        block_y = int(y / CELL_HEIGHT)
 
-        if isValidCoord(16, block_x) and isValidCoord(12, block_y):
+        if isValidCoord(CELL_COL_NUM, block_x) and isValidCoord(CELL_ROW_NUM, block_y):
             dat[block_y][block_x] += 1
 
 
