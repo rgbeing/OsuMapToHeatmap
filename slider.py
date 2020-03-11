@@ -151,10 +151,18 @@ class BezierSlider(Slider):
         return True
 
 class LinearSlider(Slider):
+    def constructControlPoints(self, pos, points):
+        output = [[pos]]
+        output[0].extend([Point(*map(int, i.split(':'))) for i in points])
+        for curve in output:
+            for pt in curve:
+                print(pt)
+        return output
+
     def getEndPoint(self):
-        # There are cases the number of control points of linear slider is more than two.
-        # e.g.) Tsurupettan https://osu.ppy.sh/beatmapsets/2626#osu/19990
-        # Codes are needed to deal with these situation.
+# There are cases the number of control points of linear slider is more than two.
+# e.g.) Tsurupettan https://osu.ppy.sh/beatmapsets/2626#osu/19990
+# Codes are needed to deal with these situation.
         len_left = self.length
         line_num = len(self.points[0]) - 1
 
@@ -168,7 +176,7 @@ class LinearSlider(Slider):
             len_left -= len_segment
 
         ratio = len_left / math.sqrt((self.points[0][-1] - self.points[0][-2]).normSquared())
-        end = self.points[0][0] + (self.points[0][-1] - self.points[0][-2]) * ratio
+        end = self.points[0][-2] + (self.points[0][-1] - self.points[0][-2]) * ratio
         end.x = round(end.x)
         end.y = round(end.y)
         return end
@@ -178,9 +186,13 @@ class PerfectCircleSlider(Slider):
     def getEndPoint(self):
         return Point(0, 0)
 
+# Not made yet!
+class CatmullSlider(Slider):
+    def getEndPoint(self):
+        return Point(0, 0)
 
 if __name__ == '__main__':
-    curve1 = BezierSlider()
+    curve1 = LinearSlider()
     curve1.parseSliderString(input())
     output = curve1.getEndPoint()
 
