@@ -154,9 +154,6 @@ class LinearSlider(Slider):
     def constructControlPoints(self, pos, points):
         output = [[pos]]
         output[0].extend([Point(*map(int, i.split(':'))) for i in points])
-        for curve in output:
-            for pt in curve:
-                print(pt)
         return output
 
     def getEndPoint(self):
@@ -188,12 +185,67 @@ class PerfectCircleSlider(Slider):
 
 # Not made yet!
 class CatmullSlider(Slider):
+    def constructControlPoints(self, pos, points):
+        output = [[pos]]
+        output[0].extend([Point(*map(int, i.split(':'))) for i in points])
+        return output
+
     def getEndPoint(self):
-        return Point(0, 0)
+        return self.getInterpolatedPoints()[-1]
+
+    def constructCurvesList(self):
+        curves = []
+        control_points = []
+        
+        if self.points[0][0] != self.points[0][1]:
+            control_points.append(self.points[0][0])
+        
+        for p in self.points[0]:
+            control_points.append(p)
+
+            if len(control_points) >= 4:
+                curves.append(copy.copy(control_points[-4:]))
+        
+        if self.points[0][-1] != self.points[0][-2]:
+            control_points.append(self.points[0][-1])
+            curves.append(copy.copy(control_points[-4:]))
+
+        return curves
+
+    def getInterpolatedPoints(self):
+        output = []
+        curves = self.constructCurvesList()
+        len_left = self.length
+
+        # get a point in curve at time t
+        getPoint = lambda t, a, b, c, d: a + b*t + c*(t**2) + d*(t**3)
+
+        for curve in curves:
+            approx_length_halfed = int(math.sqrt((curve[1] - curve[2]).normSquared()) / 2)
+            coef = self.getCoefficient(curve)
+
+            for i in range(approx_length_halfed):
+                p = getPoint(i/approx_length_halfed, *coef)
+                output.append(p)
+
+        return output
+        
+    def getCoefficient(self, p):
+        ''' get [a b c d] which can produce catmull-rom spline P(t)=a+bt+ct^2+dt^3.
+            variable curve is a list of x or y coordinates, not Point objects. '''
+
+        # Followings are double of the result.
+        a =             p[1] * 2              
+        b = p[0] * -1             + p[2] * 1
+        c = p[0] * 2  - p[1] * 5  + p[2] * 4  - p[3]
+        d = p[0] * -1 + p[1] * 3  - p[2] * 3  + p[3]
+
+        return (a/2, b/2, c/2, d/2)
 
 if __name__ == '__main__':
-    curve1 = LinearSlider()
+    curve1 = CatmullSlider()
     curve1.parseSliderString(input())
-    output = curve1.getEndPoint()
 
-    print(output)
+    output = curve1.getInterpolatedPoints()
+    print(len(output))
+    print(curve1.getEndPoint())
