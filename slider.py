@@ -157,11 +157,6 @@ class BezierSlider(Slider):
 
 
 class LinearSlider(Slider):
-    def constructControlPoints(self, pos, points):
-        output = [[pos]]
-        output[0].extend([Point(*map(int, i.split(':'))) for i in points])
-        return output
-
     def getEndPoint(self):
 # There are cases the number of control points of linear slider is more than two.
 # e.g.) Tsurupettan https://osu.ppy.sh/beatmapsets/2626#osu/19990
@@ -191,11 +186,6 @@ class PerfectCircleSlider(Slider):
 
 # Not fully made yet!
 class CatmullSlider(Slider):
-    def constructControlPoints(self, pos, points):
-        output = [[pos]]
-        output[0].extend([Point(*map(int, i.split(':'))) for i in points])
-        return output
-
     def getEndPoint(self):
         return self.getInterpolatedPoints()[-1]
 
