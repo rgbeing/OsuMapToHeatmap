@@ -33,6 +33,17 @@ class Slider(metaclass = abc.ABCMeta):
         self.length = float(line[7])
 
     def constructControlPoints(self, pos, points):
+        output = [[pos]]
+        output[0].extend([Point(*map(int, i.split(':'))) for i in points])
+        return output
+
+    @abc.abstractmethod
+    def getEndPoint(self):
+        pass
+
+
+class BezierSlider(Slider):
+    def constructControlPoints(self, pos, points):
         control_points = [[pos]]
         points = [Point(*map(int, i.split(':'))) for i in points]
 
@@ -46,12 +57,6 @@ class Slider(metaclass = abc.ABCMeta):
         
         return control_points
 
-    @abc.abstractmethod
-    def getEndPoint(self):
-        pass
-
-
-class BezierSlider(Slider):
     def getEndPoint(self):
         return self.getApproximatedPoints()[-1]
 
@@ -150,6 +155,7 @@ class BezierSlider(Slider):
             return False
         return True
 
+
 class LinearSlider(Slider):
     def constructControlPoints(self, pos, points):
         output = [[pos]]
@@ -183,7 +189,7 @@ class PerfectCircleSlider(Slider):
     def getEndPoint(self):
         return Point(0, 0)
 
-# Not made yet!
+# Not fully made yet!
 class CatmullSlider(Slider):
     def constructControlPoints(self, pos, points):
         output = [[pos]]
@@ -196,7 +202,7 @@ class CatmullSlider(Slider):
     def constructCurvesList(self):
         curves = []
         control_points = []
-        
+
         if self.points[0][0] != self.points[0][1]:
             control_points.append(self.points[0][0])
         
