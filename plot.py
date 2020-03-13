@@ -21,7 +21,7 @@ def isValidCoord(upper, value):
 def addData(line):
     obj_type = int(line.split(',')[3])
 
-    # Abort if spinner
+    # Abort spinner
     if obj_type & 8 > 0:
         return
     elif obj_type & 2 > 0:
@@ -45,11 +45,12 @@ def addCircle(line):
 
 def addSlider(line):
     slider_type_dict = {'B': BezierSlider(),
-                        'L': LinearSlider()}
+                        'L': LinearSlider(),
+                        'C': CatmullSlider()}
 
     slider_type = (line.split(',')[5]).split('|')[0]
     # Not support perfect-circle and catmul slider for now
-    if slider_type in ['P', 'C']:
+    if slider_type in ['P']:
         addCircle(line)
         return
     

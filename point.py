@@ -12,6 +12,9 @@ class Point:
     def __eq__(self, obj):
         return isinstance(obj, Point) and self.x == obj.x and self.y == obj.y
 
+    def __neg__(self):
+        return Point(-(self.x), -(self.y))
+
     def __add__(self, obj):
         if isinstance(obj, Point):
             return Point(self.x + obj.x, self.y + obj.y)
@@ -39,6 +42,9 @@ class Point:
     def normSquared(self):
         ''' Squared value of the vector's length'''
         return self.x ** 2 + self.y ** 2
+
+    def round(self):
+        return Point(round(self.x), round(self.y))
 
 if __name__ == '__main__':
     p1 = Point(16, 14)

@@ -8,5 +8,5 @@ Visualize a map with a heatmap!
 1. install packages in requirements.txt
 1. Run plot.py, and input the path of .osu file (either absolute or relative)
 
-## What it lacks (will be updated)
-* Support perfect circle sliders and catmull sliders
+## TODO
+* Support perfect circle sliders

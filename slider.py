@@ -175,9 +175,7 @@ class LinearSlider(Slider):
 
         ratio = len_left / math.sqrt((self.points[0][-1] - self.points[0][-2]).normSquared())
         end = self.points[0][-2] + (self.points[0][-1] - self.points[0][-2]) * ratio
-        end.x = round(end.x)
-        end.y = round(end.y)
-        return end
+        return end.round()
 
 # Not made yet!
 class PerfectCircleSlider(Slider):
@@ -187,7 +185,15 @@ class PerfectCircleSlider(Slider):
 # Not fully made yet!
 class CatmullSlider(Slider):
     def getEndPoint(self):
-        return self.getInterpolatedPoints()[-1]
+        # Catmull with only two points is just a line.
+        # Converting to linear one is cheaper way than interpolating.
+        if len(self.points[0]) == 2 or (
+            len(self.points[0]) == 3 and self.points[0][0] == self.points[0][1]):
+            conv = LinearSlider(points=self.points, length=self.length)
+            return conv.getEndPoint()
+        
+        res = self.getInterpolatedPoints()[-1]
+        return res.round()
 
     def constructCurvesList(self):
         curves = []
@@ -209,32 +215,49 @@ class CatmullSlider(Slider):
         return curves
 
     def getInterpolatedPoints(self):
-        output = []
+        # Initialize with pos to calculate len_left easily
+        output = [self.pos]
         curves = self.constructCurvesList()
         len_left = self.length
 
-        # get a point in curve at time t
+        # Get a point in curve at time t
         getPoint = lambda t, a, b, c, d: a + b*t + c*(t**2) + d*(t**3)
 
         for curve in curves:
-            approx_length_halfed = int(math.sqrt((curve[1] - curve[2]).normSquared()) / 2)
+            approx_length_quarter = int(math.sqrt((curve[1] - curve[2]).normSquared()) / 4)
             coef = self.getCoefficient(curve)
 
-            for i in range(approx_length_halfed):
-                p = getPoint(i/approx_length_halfed, *coef)
+            for i in range(approx_length_quarter):
+                if len_left > 0:
+                    p = getPoint(i/approx_length_quarter, *coef)
+                    len_left -= math.sqrt((output[-1] - p).normSquared())
+
+                    output.append(p)
+             
+            if len_left <= 0:
+                break
+
+        # If the length still remains, the curve needs to be EXTRApolated.
+        if len_left > 0:
+            curve = curves[-1]
+            coef = self.getCoefficient(curve)
+            i = 0
+
+            while len_left <= 0:
+                p = getPoint(i/50, *coef) # 50 here is arbitrary constant
                 output.append(p)
+                len_left -= math.sqrt((output[-2] - p).normSquared())
+                i += 1
 
         return output
         
     def getCoefficient(self, p):
-        ''' get [a b c d] which can produce catmull-rom spline P(t)=a+bt+ct^2+dt^3.
-            variable curve is a list of x or y coordinates, not Point objects. '''
-
+        ''' get [a b c d] which can produce catmull-rom spline P(t)=a+bt+ct^2+dt^3.'''
         # Followings are double of the result.
-        a =             p[1] * 2              
-        b = p[0] * -1             + p[2] * 1
-        c = p[0] * 2  - p[1] * 5  + p[2] * 4  - p[3]
-        d = p[0] * -1 + p[1] * 3  - p[2] * 3  + p[3]
+        a =              p[1] * 2              
+        b = - p[0]                + p[2] * 1
+        c =   p[0] * 2 - p[1] * 5 + p[2] * 4  - p[3]
+        d = - p[0]     + p[1] * 3 - p[2] * 3  + p[3]
 
         return (a/2, b/2, c/2, d/2)
 
@@ -242,6 +265,5 @@ if __name__ == '__main__':
     curve1 = CatmullSlider()
     curve1.parseSliderString(input())
 
-    output = curve1.getInterpolatedPoints()
-    print(len(output))
+    #output = curve1.getInterpolatedPoints()
     print(curve1.getEndPoint())
