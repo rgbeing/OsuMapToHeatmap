@@ -177,12 +177,51 @@ class LinearSlider(Slider):
         end = self.points[0][-2] + (self.points[0][-1] - self.points[0][-2]) * ratio
         return end.round()
 
-# Not made yet!
+
 class PerfectCircleSlider(Slider):
     def getEndPoint(self):
-        return Point(0, 0)
+        center = self.getCircumcenter()
+        r = math.sqrt((center - self.points[0][0]).normSquared())
+        try:
+            isClockwise = self.orientation(self.points[0])
+        except Exception as e:
+            print(e)
+            return Point(999, 999)
+        
+        theta = self.length / r if isClockwise else -self.length / r
+        cos = math.cos(theta)
+        sin = math.sin(theta)
+        rotate = lambda p: Point(cos * p.x - sin * p.y, sin * p.x + cos * p.y)
 
-# Not fully made yet!
+        return (rotate(self.pos - center) + center).round()
+
+    def getCircumcenter(self):
+        vertex = self.points[0]
+        side2 = [(vertex[i] - vertex[i + 1]).normSquared() for i in range(-2, 1)]
+        bCoor = [side2[i] * (side2[i + 1] + side2[i + 2] - side2[i + 3]) for i in range(-3,0)]
+
+        res = Point(0, 0)
+        for i in range(3):
+            res += vertex[i] * (bCoor[i] / sum(bCoor))
+        return res
+
+    # in Osu, y-coorinate increase as object descend!
+    # Orientation is opposite of usual for that.
+    @staticmethod
+    def orientation(point_list):
+        det = 0
+        i = -len(point_list)
+        
+        while i < 0:
+            det += point_list[i].x * point_list[i + 1].y
+            det -= point_list[i + 1].x * point_list[i].y
+            i += 1
+            
+        if det == 0:
+            raise Exception('point_list cannot construct a circle')
+        return det > 0 # True for clockwise
+
+
 class CatmullSlider(Slider):
     def getEndPoint(self):
         # Catmull with only two points is just a line.
@@ -262,8 +301,7 @@ class CatmullSlider(Slider):
         return (a/2, b/2, c/2, d/2)
 
 if __name__ == '__main__':
-    curve1 = CatmullSlider()
+    curve1 = PerfectCircleSlider()
     curve1.parseSliderString(input())
 
-    #output = curve1.getInterpolatedPoints()
     print(curve1.getEndPoint())

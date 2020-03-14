@@ -46,14 +46,11 @@ def addCircle(line):
 def addSlider(line):
     slider_type_dict = {'B': BezierSlider(),
                         'L': LinearSlider(),
-                        'C': CatmullSlider()}
+                        'C': CatmullSlider(),
+                        'P': PerfectCircleSlider()}
 
     slider_type = (line.split(',')[5]).split('|')[0]
-    # Not support perfect-circle and catmul slider for now
-    if slider_type in ['P']:
-        addCircle(line)
-        return
-    
+ 
     slider_obj = slider_type_dict[slider_type]
     slider_obj.parseSliderString(line)
 

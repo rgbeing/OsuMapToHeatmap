@@ -9,4 +9,4 @@ Visualize a map with a heatmap!
 1. Run plot.py, and input the path of .osu file (either absolute or relative)
 
 ## TODO
-* Support perfect circle sliders
+* Lengthen bezier curve
